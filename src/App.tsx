@@ -5,7 +5,7 @@ function App() {
     return (
         <div className="App">
             <h1>Communication Center</h1>
-            <Editor editable />
+            <Editor editable placeholder="Write your company update here..." />
         </div>
     );
 }

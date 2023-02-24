@@ -1,17 +1,17 @@
 import {
-    EditorComponent,
-    Remirror,
+    EditorComponent, FloatingToolbar, FormattingButtonGroup, PlaceholderExtension,
+    Remirror, TableComponents, TableExtension,
     ThemeProvider,
     useHelpers,
     useKeymap,
     useRemirror,
 } from '@remirror/react';
-import { BoldExtension, ItalicExtension } from 'remirror/extensions';
-import { VStack } from '@carta/ink';
+import {DropCursorExtension, wysiwygPreset } from 'remirror/extensions';
 import React, { useCallback } from 'react';
 import { EditorState } from '@remirror/pm';
 import { TopToolbar } from './TopToolbar';
 import { AllStyledComponent } from '@remirror/styles/styled-components';
+import {FileExtension} from "@remirror/extension-file";
 
 // Hooks can be added to the context without the need for creating custom components
 const hooks = [
@@ -33,10 +33,16 @@ const hooks = [
         useKeymap('Mod-s', handleSaveShortcut);
     },
 ];
-export const Editor = ({ editable = true }: { editable?: boolean }) => {
+export const Editor = ({ placeholder, editable = true }: { placeholder?: string, editable?: boolean }) => {
     const extensions = useCallback(
-        () => [new BoldExtension(), new ItalicExtension()],
-        [],
+        () => [
+            new FileExtension({}),
+            new DropCursorExtension(),
+            new PlaceholderExtension({ placeholder }),
+            new TableExtension(),
+            ...wysiwygPreset()
+        ],
+        [placeholder],
     );
 
     const { manager, state } = useRemirror({
@@ -55,6 +61,10 @@ export const Editor = ({ editable = true }: { editable?: boolean }) => {
                 >
                     {editable && <TopToolbar />}
                     <EditorComponent />
+                    <FloatingToolbar positioner="selection">
+                        <FormattingButtonGroup />
+                    </FloatingToolbar>
+                    <TableComponents />
                 </Remirror>
             </ThemeProvider>
         </AllStyledComponent>
