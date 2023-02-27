@@ -1,12 +1,19 @@
 import {
-    EditorComponent, FloatingToolbar, FormattingButtonGroup, PlaceholderExtension,
-    Remirror, TableComponents, TableExtension,
+    EditorComponent,
+    FloatingToolbar,
+    FormattingButtonGroup, HistoryButtonGroup,
+    IndentationButtonGroup,
+    ListButtonGroup,
+    PlaceholderExtension,
+    Remirror,
+    TableComponents,
+    TableExtension,
     ThemeProvider,
     useHelpers,
     useKeymap,
     useRemirror,
 } from '@remirror/react';
-import {DropCursorExtension, wysiwygPreset } from 'remirror/extensions';
+import {DropCursorExtension, NodeFormattingExtension, wysiwygPreset } from 'remirror/extensions';
 import React, { useCallback } from 'react';
 import { EditorState } from '@remirror/pm';
 import { TopToolbar } from './TopToolbar';
@@ -40,6 +47,7 @@ export const Editor = ({ placeholder, editable = true }: { placeholder?: string,
             new DropCursorExtension(),
             new PlaceholderExtension({ placeholder }),
             new TableExtension(),
+            new NodeFormattingExtension(),
             ...wysiwygPreset()
         ],
         [placeholder],
@@ -59,11 +67,15 @@ export const Editor = ({ placeholder, editable = true }: { placeholder?: string,
                     hooks={hooks}
                     editable={editable}
                 >
-                    {editable && <TopToolbar />}
                     <EditorComponent />
-                    <FloatingToolbar positioner="selection">
-                        <FormattingButtonGroup />
-                    </FloatingToolbar>
+                    {editable && (
+                        <FloatingToolbar positioner="selection">
+                            <FormattingButtonGroup />
+                            <IndentationButtonGroup />
+                            <ListButtonGroup />
+                            <HistoryButtonGroup />
+                        </FloatingToolbar>)
+                    }
                     <TableComponents />
                 </Remirror>
             </ThemeProvider>

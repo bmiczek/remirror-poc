@@ -15,15 +15,14 @@ export const TopToolbar = () => {
     }, [getJSON]);
 
     return (
-        <HStack align="distributed">
+        <HStack align="distributed" alignY="top">
             <HStack spacing="xsmall">
                 <HistoryButtonGroup />
                 <DataTransferButtonGroup />
                 <HeadingLevelButtonGroup />
                 <BasicFormattingButtonGroup />
-                <ListButtonGroup>
+                <ListButtonGroup />
                 <CreateTableButton />
-                </ListButtonGroup>
             </HStack>
             <Button size="small" type="primary" onClick={handleSaveClick}>
                 Save Draft
