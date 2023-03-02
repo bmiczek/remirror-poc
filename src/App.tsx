@@ -4,7 +4,7 @@ import { Editor } from './components/Editor';
 function App() {
     return (
         <div className="App">
-            <h1>Communication Center</h1>
+            <h1>Communication Center POC</h1>
             <Editor editable placeholder="Write your company update here..." />
         </div>
     );

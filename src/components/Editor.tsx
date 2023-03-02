@@ -1,7 +1,9 @@
 import {
     EditorComponent,
     FloatingToolbar,
-    FormattingButtonGroup, HistoryButtonGroup,
+    FloatingWrapper,
+    FormattingButtonGroup,
+    HistoryButtonGroup,
     IndentationButtonGroup,
     ListButtonGroup,
     PlaceholderExtension,
@@ -13,12 +15,17 @@ import {
     useKeymap,
     useRemirror,
 } from '@remirror/react';
-import {DropCursorExtension, NodeFormattingExtension, wysiwygPreset } from 'remirror/extensions';
+import {
+    DropCursorExtension,
+    NodeFormattingExtension,
+    wysiwygPreset,
+} from 'remirror/extensions';
 import React, { useCallback } from 'react';
 import { EditorState } from '@remirror/pm';
-import { TopToolbar } from './TopToolbar';
 import { AllStyledComponent } from '@remirror/styles/styled-components';
-import {FileExtension} from "@remirror/extension-file";
+import { FileExtension } from '@remirror/extension-file';
+import { FileAttachmentExtension } from '../extensions/FileAttachmentExtension';
+import { AddModuleButton } from './AddModuleButton';
 
 // Hooks can be added to the context without the need for creating custom components
 const hooks = [
@@ -40,15 +47,22 @@ const hooks = [
         useKeymap('Mod-s', handleSaveShortcut);
     },
 ];
-export const Editor = ({ placeholder, editable = true }: { placeholder?: string, editable?: boolean }) => {
+export const Editor = ({
+    placeholder,
+    editable = true,
+}: {
+    placeholder?: string;
+    editable?: boolean;
+}) => {
     const extensions = useCallback(
         () => [
+            new FileAttachmentExtension({ disableExtraAttributes: true }),
             new FileExtension({}),
             new DropCursorExtension(),
             new PlaceholderExtension({ placeholder }),
             new TableExtension(),
             new NodeFormattingExtension(),
-            ...wysiwygPreset()
+            ...wysiwygPreset(),
         ],
         [placeholder],
     );
@@ -59,26 +73,40 @@ export const Editor = ({ placeholder, editable = true }: { placeholder?: string,
 
     // Using the hooks prop to inject functionality that doesn't require rendered elements
     return (
-        <AllStyledComponent>
-            <ThemeProvider>
-                <Remirror
-                    manager={manager}
-                    initialContent={state}
-                    hooks={hooks}
-                    editable={editable}
-                >
-                    <EditorComponent />
-                    {editable && (
-                        <FloatingToolbar positioner="selection">
-                            <FormattingButtonGroup />
-                            <IndentationButtonGroup />
-                            <ListButtonGroup />
-                            <HistoryButtonGroup />
-                        </FloatingToolbar>)
-                    }
-                    <TableComponents />
-                </Remirror>
-            </ThemeProvider>
-        </AllStyledComponent>
+        <div style={{ position: 'relative' }}>
+            <AllStyledComponent>
+                <ThemeProvider>
+                    <Remirror
+                        manager={manager}
+                        initialContent={state}
+                        hooks={hooks}
+                        editable={editable}
+                    >
+                        <EditorComponent />
+                        <TableComponents />
+                        {editable && (
+                            <FloatingToolbar positioner="selection">
+                                <FormattingButtonGroup />
+                                <IndentationButtonGroup />
+                                <ListButtonGroup />
+                                <HistoryButtonGroup />
+                            </FloatingToolbar>
+                        )}
+                        {/* TODO: Figure out why this floating menu isn't rendering on an empty block
+                            - it kind of works when using positioner="selection". The goal is for the "Add Module"
+                            button to render to the left of the editor when the cursor is on an empty block.
+                        */}
+                        <FloatingWrapper
+                            positioner="emptyBlock"
+                            enabled
+                            placement="left-start"
+                        >
+                            <AddModuleButton />
+                        </FloatingWrapper>
+                        <AddModuleButton />
+                    </Remirror>
+                </ThemeProvider>
+            </AllStyledComponent>
+        </div>
     );
 };
